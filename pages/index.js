@@ -1,15 +1,25 @@
 import MainGrid from './../src/components/MainGrid';
 import Box from './../src/components/Box';
+import React, { useState, useEffect } from "react";
 import { AlurakutMenu, OrkutNostalgicIconSet } from './../src/lib/alurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 
 function ProfileSidebar(propriedades) {
-  console.log(propriedades);
   return (
     <Box>
       <img src={`https://github.com/${propriedades.githubUser}.png`} style={{ borderRadius: '8px'}}></img>
     </Box>
   )
+}
+
+function buscaDados() {
+  const url = "https://api.github.com/users/originwolf/followers";
+  return fetch(url)
+    .then(async (response) => await response.json())
+    .then(async (dados) => {
+      return await dados;
+    })
+    .catch((err) => console.error("Erro ao buscar dados", err));
 }
 
 // const Title = styled.h1`
@@ -18,16 +28,24 @@ function ProfileSidebar(propriedades) {
 // `
 
 export default function Home() {
+  const [seguidores, setSeguidores] = useState([]);
+
+  useEffect(() => {
+    buscaDados().then((dados) => setSeguidores(dados));
+  }, []);
+  
   const githubUser = 'originwolf';
 
   const pessoasFavoritas = [
-    'juunegreiros', 
-    'omariosouto', 
-    'peas', 
-    'rafaballerini', 
+    'Everton-Afonso', 
+    'nettuf', 
+    'GVenancio', 
+    'matheuefranco', 
     'printf-ana', 
-    'marcobrunodev'
+    'mleitejunior'
   ]
+
+  console.log(seguidores);
 
   return (
     <>
@@ -50,15 +68,25 @@ export default function Home() {
 
       <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
         <ProfileRelationsBoxWrapper>
-          <h2 className="smallTitle">Pessoas da comunidade ({pessoasFavoritas.length})</h2>
+          <h2 className="smallTitle">Pessoas da comunidade ({seguidores.length})</h2>
 
           <ul>
-            {pessoasFavoritas.map((itemAtual) => {
+            {/* {pessoasFavoritas.map((itemAtual) => {
               return (
-                <li>
-                  <a href={`/users/${itemAtual}`} key={itemAtual}>
+                <li key={itemAtual}>
+                  <a href={`/users/${itemAtual}`}>
                     <img src={`https://github.com/${itemAtual}.png`}></img>
                     <span>{itemAtual}</span>
+                  </a>
+                </li>
+              );
+            })} */}
+            {seguidores.map((itemAtual) => {
+              return (
+                <li key={itemAtual}>
+                  <a href={`/users/${itemAtual.login}`}>
+                    <img src={`https://github.com/${itemAtual.login}.png`}></img>
+                    <span>{itemAtual.login}</span>
                   </a>
                 </li>
               );
